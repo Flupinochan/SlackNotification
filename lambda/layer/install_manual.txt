@@ -1,0 +1,1 @@
+pip install -r ./lambda/layer/requirements.txt -t ./lambda/layer/python
