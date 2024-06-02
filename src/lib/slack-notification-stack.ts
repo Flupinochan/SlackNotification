@@ -35,13 +35,13 @@ export class SlackNotificationStack extends cdk.Stack {
         }),
       },
     });
-    const lambdaLayer = new lambda.LayerVersion(this, param.lambdaCommon.layerName, {
-      layerVersionName: param.lambdaCommon.layerName,
-      description: param.lambdaCommon.layerDesciption,
-      code: lambda.Code.fromAsset(path.join(__dirname, "../../lambda/layer/")),
-      compatibleRuntimes: [lambda.Runtime.PYTHON_3_12],
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-    });
+    // const lambdaLayer = new lambda.LayerVersion(this, param.lambdaCommon.layerName, {
+    //   layerVersionName: param.lambdaCommon.layerName,
+    //   description: param.lambdaCommon.layerDesciption,
+    //   code: lambda.Code.fromAsset(path.join(__dirname, "../../lambda/layer/")),
+    //   compatibleRuntimes: [lambda.Runtime.PYTHON_3_12],
+    //   removalPolicy: cdk.RemovalPolicy.DESTROY,
+    // });
     const lambdaCE_LogGroup = new logs.LogGroup(this, param.lambdaCE.logGroupName, {
       logGroupName: param.lambdaCE.logGroupName,
       retention: logs.RetentionDays.ONE_DAY,
