@@ -21,6 +21,19 @@ export class SlackNotificationStack extends cdk.Stack {
         iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchFullAccessV2'),
         iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonS3FullAccess"),
       ],
+      inlinePolicies: {
+        "CostExplorerAccess": new iam.PolicyDocument({
+          statements: [
+            new iam.PolicyStatement({
+              effect: iam.Effect.ALLOW,
+              actions: [
+                "ce:*",
+              ],
+              resources: ["*"],
+            }),
+          ],
+        }),
+      },
     });
     const lambdaLayer = new lambda.LayerVersion(this, param.lambdaCommon.layerName, {
       layerVersionName: param.lambdaCommon.layerName,
