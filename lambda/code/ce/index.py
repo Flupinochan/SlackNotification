@@ -137,28 +137,42 @@ def create_cost_img(key_amount_dict_sort):
         #     },
         # }
 
-        # サービス別のコストを数値に変換
-        for date in key_amount_dict_sort:
-            for service in key_amount_dict_sort[date]:
-                key_amount_dict_sort[date][service] = float(key_amount_dict_sort[date][service])
+        # Convert costs (strings) to costs (float) by service
+        for day in key_amount_dict_sort:
+            for service in key_amount_dict_sort[day]:
+                key_amount_dict_sort[day][service] = float(key_amount_dict_sort[day][service])
 
-        # 日付、サービス、コストのリストを作成
-        dates = list(key_amount_dict_sort.keys())
+        # costs_by_service (Empty values are set at 0)
+        # {
+        #     'service_a': [100, 150, 0],
+        #     'service_b': [200, 0, 250],
+        #     'service_c': [0, 300, 0],
+        #     'service_d': [0, 0, 400]
+        # }
+
+        # Create a list of dates, services and costs
+        days = list(key_amount_dict_sort.keys())
         services = list({service for day in key_amount_dict_sort.values() for service in day.keys()})
-        costs_by_service = {service: [key_amount_dict_sort[date].get(service, 0) for date in dates] for service in services}
+        costs_by_service = {service: [key_amount_dict_sort[day].get(service, 0) for day in days] for service in services}
+        sorted_costs_by_service = dict(sorted(costs_by_service.items(), key=lambda item: sum(item[1]), reverse=True))
+        log.debug(f"Days: {days}")
+        log.debug(f"Services: {services}")
+        log.debug(f"Cost by services 7-day dict: {sorted_costs_by_service}")
 
         plt.figure(figsize=(10, 6))  # Set the size of the graph
-        bottom = [0] * len(dates)
-        for service in services:
-            costs = costs_by_service[service]
-            plt.bar(dates, costs, bottom=bottom, label=service)  # Draw the dayly bar graph
-            bottom = [b + c for b, c in zip(bottom, costs)]
+        plt.rcParams["axes.prop_cycle"] = plt.cycler("color", plt.get_cmap("Pastel1").colors)  # Colour of graph
+        bottom = [0] * len(days)  # Initialise the base of the bar with 0
+        for service in sorted_costs_by_service:
+            costs = sorted_costs_by_service[service]
+            plt.bar(days, costs, bottom=bottom, label=service)  # Draw the dayly bar graph
+            bottom = [b + c for b, c in zip(bottom, costs)]  # Add the height of the BAR at cost
 
         # Set the label
         plt.xlabel("Day")
-        plt.ylabel("Cost $")
+        plt.ylabel("Cost\n (USD)\n", rotation="horizontal")
+        plt.ylim(0, max(bottom) * 1.2)
         plt.title("Cost in the last week")
-        plt.legend(loc="upper left", bbox_to_anchor=(1, 1))
+        plt.legend(loc="upper left", bbox_to_anchor=(1, 1))  # Label position
         plt.tight_layout()
 
         # Save the graph as an image
@@ -172,7 +186,7 @@ def create_cost_img(key_amount_dict_sort):
 
 
 # ----------------------------------------------------------------------
-# Slack Message
+# Send an image to Slack
 # ----------------------------------------------------------------------
 def send_slack(cost_img):
     try:
