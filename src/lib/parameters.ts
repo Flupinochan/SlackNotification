@@ -10,5 +10,6 @@ export class Parameters {
   lambdaCE = {
     logGroupName: "SlackNotification-LambdaCE-Log",
     functionName: "SlackNotification-LambdaCE",
+    eventBridgeName: "SlackNotification-LambdaCE-EventBridge",
   }
 }
